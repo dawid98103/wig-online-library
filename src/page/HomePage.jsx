@@ -32,8 +32,8 @@ const HomePage = () => {
             <Segment>
                 <CarouselWrapper>
                     <Carousel>
-                        <img src={process.env.PUBLIC_URL + "/image/2.jpg"} />
-                        <img src={process.env.PUBLIC_URL + "/image/2.jpg"} />
+                        <img src={process.env.PUBLIC_URL + "/image/2.jpg"} alt="Advertisement"/>
+                        <img src={process.env.PUBLIC_URL + "/image/2.jpg"} alt="Advertisement 2"/>
                     </Carousel>
                 </CarouselWrapper>
             </Segment>

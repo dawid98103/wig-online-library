@@ -17,6 +17,10 @@ export const GlobalContext = createContext(initialState);
 export const GlobalProvider = ({ children }) => {
     const [state, dispatch] = useReducer(AppReducer, initialState);
 
+    function getItemFromList(id){
+        return state.avaliableBooks.find(book => book.id === id);
+    }
+
     function addItemToList(item) {
         dispatch({
             type: 'ADD_ITEM',
@@ -31,7 +35,7 @@ export const GlobalProvider = ({ children }) => {
     }
 
     return (
-        <GlobalContext.Provider value={{ shoppingList: state.shoppingList, avaliableBooks: state.avaliableBooks, addItemToList, removeItemFromList }}>
+        <GlobalContext.Provider value={{ shoppingList: state.shoppingList, avaliableBooks: state.avaliableBooks, getItemFromList , addItemToList, removeItemFromList }}>
             {children}
         </GlobalContext.Provider>
     )

@@ -1,7 +1,8 @@
-import React, { useContext, useState, useMemo, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import ContentWrapper from "../components/ContentWrapper";
 import { GlobalContext } from "../store/GlobalState";
-import { Button, Card, Image, Pagination, Search } from 'semantic-ui-react'
+import { Card, Pagination, Search } from 'semantic-ui-react'
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const PaginationFooter = styled.div`
@@ -35,13 +36,19 @@ const CatalogPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [currentTableData, setCurrentTableData] = useState([]);
     const { avaliableBooks } = useContext(GlobalContext);
+    const navigate = useNavigate();
 
-    useEffect(() => {
+    useEffect(() => {         
+        const elementsToRender = () => {
+            const firstPageIndex = (currentPage - 1) * PageSize;
+            const lastPageIndex = firstPageIndex + PageSize;
+            return avaliableBooks.slice(firstPageIndex, lastPageIndex);
+        }
         const elementsOnPage = elementsToRender();
         console.log("Items on page:");
         console.log(elementsOnPage);
         setCurrentTableData(elementsOnPage)
-    }, [currentPage])
+    }, [avaliableBooks, currentPage])
 
     const calculatePagesCount = () => {
         return Math.ceil(avaliableBooks.length / PageSize);
@@ -52,10 +59,8 @@ const CatalogPage = () => {
         setCurrentPage(activePage)
     }
 
-    const elementsToRender = () => {
-        const firstPageIndex = (currentPage - 1) * PageSize;
-        const lastPageIndex = firstPageIndex + PageSize;
-        return avaliableBooks.slice(firstPageIndex, lastPageIndex);
+    const onCardClick = (id) => {
+        navigate(`/details/${id}`);
     }
 
     const shortDescription = (desc) => {
@@ -66,10 +71,12 @@ const CatalogPage = () => {
         return currentTableData.map(book => {
             return (
                 <ResizedCard
+                    key={book.id}
                     href='#card-example-link-card'
                     image={book.image}
                     header={book.name}
                     meta={`${book.price} zł`}
+                    onClick={() => onCardClick(book.id)}
                     description={shortDescription(book.description)}
                 />
             )
