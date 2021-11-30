@@ -3,8 +3,6 @@ import ContentWrapper from "../components/ContentWrapper";
 import { GlobalContext } from "../store/GlobalState";
 import { Card, Pagination, Search, Button, Image } from 'semantic-ui-react'
 import { useNavigate } from "react-router-dom";
-import AddModal from "../components/modal/AddModal";
-import EditModal from "../components/modal/EditModal";
 import styled from "styled-components";
 
 const PaginationFooter = styled.div`
@@ -32,23 +30,23 @@ const ResizedCard = styled(Card)`
     width: 0.5em;
 `
 
-const CatalogPage = () => {
+const FavoritePage = () => {
     const [pageSize] = useState(10)
     const [currentPage, setCurrentPage] = useState(1);
     const [currentTableData, setCurrentTableData] = useState([]);
     const [searchValue, setSearchValue] = useState("")
     const [refresh, setRefresh] = useState(false)
-    const { avaliableBooks, currentUser, deleteItemFromList } = useContext(GlobalContext);
+    const { favoriteBooks } = useContext(GlobalContext);
     const searchRef = useRef([]);
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (avaliableBooks !== undefined) {
+        if (favoriteBooks !== undefined) {
             const filteredValues = () => {
                 if (searchValue === "") {
-                    return avaliableBooks;
+                    return favoriteBooks;
                 } else {
-                    return avaliableBooks.filter(book => {
+                    return favoriteBooks.filter(book => {
                         return book.name.toLowerCase().includes(searchValue.toLowerCase())
                     })
                 }
@@ -62,16 +60,9 @@ const CatalogPage = () => {
 
             searchRef.current = filteredValues();
             const elementsOnPage = elementsToRender();
-            console.log("Items on page:");
-            console.log(elementsOnPage);
             setCurrentTableData(elementsOnPage);
         }
     }, [searchValue, currentPage, refresh])
-
-    const handleDeleteBook = (id) => {
-        deleteItemFromList(id)
-        setRefresh(!refresh)
-    }
 
     const calculatePagesCount = () => {
         return Math.ceil(searchRef.current.length / pageSize);
@@ -118,27 +109,6 @@ const CatalogPage = () => {
                             {shortDescription(book.description)}
                         </Card.Description>
                     </Card.Content>
-                    {currentUser?.role === 1 &&
-                        <Card.Content extra>
-                            <div className='ui two buttons'>
-                                <EditModal
-                                    currentId={book.id}
-                                    currentName={book.name}
-                                    currentDescription={book.description}
-                                    currentAuthor={book.author}
-                                    currentPublishedBy={book.publishedBy}
-                                    currentReleaseDate={book.releaseDate}
-                                    currentSeries={book.series}
-                                    currentNumberOfPages={book.numberOfPages}
-                                    currentPrice={book.price}
-                                    currentImage={book.image}
-                                    refresh={() => setRefresh(!refresh)} />
-                                <Button basic color='red' onClick={() => handleDeleteBook(book.id)}>
-                                    Usuń
-                                </Button>
-                            </div>
-                        </Card.Content>
-                    }
                 </ResizedCard>
             )
         })
@@ -147,10 +117,6 @@ const CatalogPage = () => {
     return (
         <ContentWrapper>
             <SearchBar>
-                {currentUser?.role === 1 &&
-                    <AddModal>
-                        Dodaj +
-                    </AddModal>}
                 <Search onSearchChange={onChangeSearchValue} value={searchValue} showNoResults={false} />
             </SearchBar>
             <ContentCenter>
@@ -175,4 +141,4 @@ const CatalogPage = () => {
     )
 }
 
-export default CatalogPage;
+export default FavoritePage;

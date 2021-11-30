@@ -1,6 +1,6 @@
-import React, {useState,useEffect ,useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import ContentWrapper from "../components/ContentWrapper";
-import { Grid, Image, Loader, Segment, Card, List } from "semantic-ui-react";
+import { Grid, Image, Loader, Segment, Card, List, Button, Icon } from "semantic-ui-react";
 import { useParams } from 'react-router-dom';
 import { GlobalContext } from "../store/GlobalState";
 import styled from "styled-components";
@@ -26,60 +26,88 @@ const ListItemWithPadding = styled(List.Item)`
 `
 
 const DetailsPage = () => {
-    const {id} = useParams();
+    const { id } = useParams();
     const [book, setBook] = useState(null)
-    const {getItemFromList} = useContext(GlobalContext)
+    const [inFavorite, setInFavorite] = useState(false)
+    const { getItemFromList, addFavorite, currentUser, isInFavorite, deleteFavorite } = useContext(GlobalContext)
 
     useEffect(() => {
         const selectedBook = getItemFromList(Number.parseInt(id));
-        console.log(selectedBook);
+        setInFavorite(isInFavorite(selectedBook.id))
         setBook(selectedBook);
     }, [getItemFromList, id])
 
+    const addToFavorite = () => {
+        addFavorite(book)
+    }
+
+    const deleteFromFavorite = () => {
+        deleteFavorite(book.id)
+    }
+
     return (
         <ContentWrapper>
-            {book == null ? 
-            <Loader />
-            :
-            <Grid columns={2} divided style={{marginTop: '0px'}}>
-            <Grid.Row>
-                <Grid.Column width={11}>
-                    <LeftPanelWrapper>
-                        <HeaderWrapper>
-                            <h1>{book.name}</h1>
-                        </HeaderWrapper>
-                        <Segment>
-                            {book.description}
-                        </Segment>
-                    </LeftPanelWrapper>
-                </Grid.Column>
-                <Grid.Column width={5}>
-                    <RightPanelWrapper>
-                    <Card>
-                        <Image src={`${book.image}`} wrapped ui={false} />
-                        <Card.Content>
-                            <Card.Description>
-                                <List divided>
-                                    <ListItemWithPadding>
-                                        Wydawnictwo: {book.publishedBy}
-                                    </ListItemWithPadding>
-                                    <ListItemWithPadding>
-                                        Data wydania: {book.releaseDate}
-                                    </ListItemWithPadding>
-                                    <ListItemWithPadding>
-                                        Seria: {book.series}
-                                    </ListItemWithPadding>
-                                    <ListItemWithPadding>
-                                        Strony: {book.numberOfPages}
-                                    </ListItemWithPadding>
-                                </List>
-                            </Card.Description>
-                        </Card.Content>
-                    </Card>
-                    </RightPanelWrapper>
-                </Grid.Column>
-            </Grid.Row>
-        </Grid>
+            {book == null ?
+                <Loader />
+                :
+                <Grid columns={2} divided style={{ marginTop: '0px' }}>
+                    <Grid.Row>
+                        <Grid.Column width={11}>
+                            <LeftPanelWrapper>
+                                <HeaderWrapper>
+                                    <h1>{book.name}</h1>
+                                </HeaderWrapper>
+                                <Segment>
+                                    {book.description}
+                                </Segment>
+                                {currentUser?.role === 2 &&
+                                    <Segment>
+                                        {inFavorite ?
+                                            <Button color='red' onClick={() => deleteFromFavorite()}>
+                                                <Icon name='delete' />
+                                                Usuń z ulubionych
+                                            </Button>
+                                            :
+                                            <Button color='red' onClick={() => addToFavorite()}>
+                                                <Icon name='heart' />
+                                                Dodaj do ulubionych
+                                            </Button>
+                                        }
+
+                                    </Segment>
+                                }
+                            </LeftPanelWrapper>
+                        </Grid.Column>
+                        <Grid.Column width={5}>
+                            <RightPanelWrapper>
+                                <Card>
+                                    <Image src={`${book.image}`} wrapped ui={false} />
+                                    <Card.Content>
+                                        <Card.Description>
+                                            <List divided>
+                                                <ListItemWithPadding>
+                                                    Autor: {book.author}
+                                                </ListItemWithPadding>
+                                                <ListItemWithPadding>
+                                                    Wydawnictwo: {book.publishedBy}
+                                                </ListItemWithPadding>
+                                                <ListItemWithPadding>
+                                                    Data wydania: {book.releaseDate}
+                                                </ListItemWithPadding>
+                                                <ListItemWithPadding>
+                                                    Seria: {book.series}
+                                                </ListItemWithPadding>
+                                                <ListItemWithPadding>
+                                                    Strony: {book.numberOfPages}
+                                                </ListItemWithPadding>
+                                            </List>
+                                        </Card.Description>
+                                    </Card.Content>
+                                </Card>
+                            </RightPanelWrapper>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
             }
         </ContentWrapper>
     )

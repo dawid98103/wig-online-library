@@ -1,7 +1,9 @@
 import React, { useContext } from "react";
 import { GlobalContext } from "../store/GlobalState";
+import RegisterModal from "./modal/RegisterModal";
+import LoginModal from "./modal/LoginModal";
 import { Menu } from "semantic-ui-react";
-import { HOME_PAGE, CATALOG_PAGE } from "../page/Pages";
+import { HOME_PAGE, CATALOG_PAGE, FAVORITE_PAGE } from "../page/Pages";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -13,7 +15,7 @@ const MenuItem = styled(Menu.Item)`
 `
 
 const Header = () => {
-    const { currentPage } = useContext(GlobalContext)
+    const { currentPage, currentUser, logoutUser } = useContext(GlobalContext)
 
     return (
         <Menu stackable>
@@ -26,7 +28,7 @@ const Header = () => {
                 active={currentPage === HOME_PAGE}
             >
                 <Link to={`/`} >
-                    Home
+                    Strona główna
                 </Link>
             </MenuItem>
 
@@ -39,16 +41,32 @@ const Header = () => {
                 </Link>
             </MenuItem>
 
-            <MenuItem
-                name='sign-in'
-            >
-                Moje wypożyczenia
-            </MenuItem>
+            {currentUser &&
+                <MenuItem
+                    name='sign-in'
+                    active={currentPage === FAVORITE_PAGE}
+                >
+                    <Link to={`/favorite`}>
+                        Ulubione
+                    </Link>
+                </MenuItem>
+            }
 
             <Menu.Menu position='right'>
-                <MenuItem>
-                    Zarejestruj
-                </MenuItem>
+                {currentUser ?
+                    <MenuItem onClick={() => logoutUser()}>
+                        Wyloguj
+                    </MenuItem>
+                    :
+                    <>
+                        <MenuItem>
+                            <LoginModal />
+                        </MenuItem>
+                        <MenuItem>
+                            <RegisterModal />
+                        </MenuItem>
+                    </>
+                }
             </Menu.Menu>
         </Menu>
     )
